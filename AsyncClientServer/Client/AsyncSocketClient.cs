@@ -60,7 +60,7 @@ namespace AsyncClientServer.Client
 			TokenSource = new CancellationTokenSource();
 			Token = TokenSource.Token;
 
-			Task.Run(SendFromQueue, Token);
+			Task.Run(() => SendFromQueue(), Token);
 
 			Task.Run(() =>
 			{
@@ -249,7 +249,6 @@ namespace AsyncClientServer.Client
 			var state = (SocketState)result.AsyncState;
 			try
 			{
-
 				var receive = state.Listener.EndReceive(result);
 
 				if (state.Flag == 0)
@@ -257,36 +256,20 @@ namespace AsyncClientServer.Client
 					state.CurrentState = new InitialHandlerState(state, this, null);
 				}
 
-
 				if (receive > 0)
 				{
 					state.CurrentState.Receive(receive);
 				}
-
-				/*When the full message has been received. */
-				if (state.Read == state.MessageSize)
-				{
-					StartReceiving(state);
-					return;
-				}
-
-				/*Check if there still are messages to be received.*/
-				if (receive == state.BufferSize)
-				{
-					StartReceiving(state);
-					return;
-				}
-
-				StartReceiving(state);
-
-
 			}
 			catch (Exception ex)
 			{
 				state.Reset();
 				InvokeErrorThrown(ex);
-				StartReceiving(state);
 			}
+            finally
+            {
+                StartReceiving(state);
+            }
 		}
 
 		#endregion

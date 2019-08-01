@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.IO.Compression;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Text;
@@ -301,25 +302,27 @@ namespace AsyncClientServer
 				byte[] messageArray = null;
 				byte[] headerArray = null;
 
-				if (encrypt)
-				{
-					//Header
-					byte[] encryptedPrefix = Encoding.UTF8.GetBytes("ENCRYPTED_");
-					byte[] encryptedHeader = MessageEncryption.EncryptStringToBytes(header);
+                //if (encrypt)
+                //{
+                //	//Header
+                //	byte[] encryptedPrefix = Encoding.UTF8.GetBytes("ENCRYPTED_");
+                //	byte[] encryptedHeader = MessageEncryption.EncryptStringToBytes(header);
 
-					headerArray = new byte[encryptedHeader.Length + encryptedPrefix.Length];
+                //	headerArray = new byte[encryptedHeader.Length + encryptedPrefix.Length];
 
-					encryptedPrefix.CopyTo(headerArray, 0);
-					encryptedHeader.CopyTo(headerArray, 10);
+                //	encryptedPrefix.CopyTo(headerArray, 0);
+                //	encryptedHeader.CopyTo(headerArray, 10);
 
-					messageArray = MessageEncryption.EncryptStringToBytes(message);
-				}
-				else
-				{
-					headerArray = Encoding.UTF8.GetBytes(header);
-					messageArray = Encoding.UTF8.GetBytes(message);
-				}
+                //	messageArray = MessageEncryption.EncryptStringToBytes(message);
+                //}
+                //else
+                //{
+                //	headerArray = Encoding.UTF8.GetBytes(header);
+                //	messageArray = Encoding.UTF8.GetBytes(message);
+                //}
 
+                headerArray = Encoding.UTF8.GetBytes(header);
+                messageArray = Zip(message);
 
 				//Message
 				byte[] messageData = messageArray;
@@ -344,15 +347,53 @@ namespace AsyncClientServer
 			}
 		}
 
-		/// <summary>
-		/// Creates an array of bytes
-		/// <para>This methods converts a simple message to an byte array.
-		/// This way it can be send using sockets</para>
-		/// </summary>
-		/// <param name="message"></param>
-		/// <param name="encryptMessage">True if the message has to be encrypted.</param>
-		/// <returns>Byte[]</returns>
-		protected byte[] CreateByteMessage(string message, bool encryptMessage)
+        #region Gzip
+        protected byte[] Zip(string str)
+        {
+            var bytes = Encoding.UTF8.GetBytes(str);
+
+            using (var mso = new MemoryStream())
+            {
+                var lengthBytes = BitConverter.GetBytes(bytes.Length);
+                mso.Write(lengthBytes, 0, 4);
+                using (var gs = new GZipStream(mso, CompressionMode.Compress))
+                {
+                    gs.Write(bytes, 0, bytes.Length);
+                    gs.Flush();
+                }
+
+                return mso.ToArray();
+            }
+        }
+
+        protected string Unzip(byte[] bytes)
+        {
+            using (var msi = new MemoryStream(bytes))
+            {
+                byte[] lengthBytes = new byte[4];
+                msi.Read(lengthBytes, 0, 4);
+
+                var length = BitConverter.ToInt32(lengthBytes, 0);
+                using (var gs = new GZipStream(msi, CompressionMode.Decompress))
+                {
+                    var result = new byte[length];
+                    gs.Read(result, 0, length);
+                    return Encoding.UTF8.GetString(result);
+                }
+            }
+        }
+        #endregion
+
+
+        /// <summary>
+        /// Creates an array of bytes
+        /// <para>This methods converts a simple message to an byte array.
+        /// This way it can be send using sockets</para>
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="encryptMessage">True if the message has to be encrypted.</param>
+        /// <returns>Byte[]</returns>
+        protected byte[] CreateByteMessage(string message, bool encryptMessage)
 		{
 			return CreateByteArray(message, "MESSAGE", encryptMessage);
 		}

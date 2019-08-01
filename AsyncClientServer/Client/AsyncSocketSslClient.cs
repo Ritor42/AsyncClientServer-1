@@ -82,7 +82,7 @@ namespace AsyncClientServer.Client
 			TokenSource = new CancellationTokenSource();
 			Token = TokenSource.Token;
 
-			Task.Run(SendFromQueue, Token);
+			Task.Run(() => SendFromQueue(), Token);
 
 			Task.Run(() =>
 			{
@@ -129,7 +129,7 @@ namespace AsyncClientServer.Client
 				var stream = new NetworkStream(Listener);
 				_sslStream = new SslStream(stream, false, new RemoteCertificateValidationCallback(ValidateCertificate), null);
 
-				Task.Run(SendFromQueue, Token);
+				Task.Run(() => SendFromQueue(), Token);
 
 				Task.Run(() =>
 				{

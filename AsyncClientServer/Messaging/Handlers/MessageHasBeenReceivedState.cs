@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Text;
 using AsyncClientServer.Client;
 using AsyncClientServer.Messaging.MessageContract;
@@ -26,11 +28,13 @@ namespace AsyncClientServer.Messaging.Handlers
 
 			byte[] receivedMessageBytes = State.ReceivedBytes;
 
-			//Check if the bytes are encrypted or not.
-			if (State.Encrypted)
-				text = Encrypter.DecryptStringFromBytes(receivedMessageBytes);
-			else
-				text = Encoding.UTF8.GetString(receivedMessageBytes);
+            //Check if the bytes are encrypted or not.
+            //if (State.Encrypted)
+            //	text = Encrypter.DecryptStringFromBytes(receivedMessageBytes);
+            //else
+            //	text = Encoding.UTF8.GetString(receivedMessageBytes);
+
+            text = Unzip(receivedMessageBytes);
 
 			if (Client == null)
 			{
@@ -65,7 +69,44 @@ namespace AsyncClientServer.Messaging.Handlers
 
 		}
 
-		private void HandleMessageBroker(byte[] receivedBytes)
+        #region Gzip
+        protected byte[] Zip(string str)
+        {
+            var bytes = Encoding.UTF8.GetBytes(str);
+
+            using (var mso = new MemoryStream())
+            {
+                var lengthBytes = BitConverter.GetBytes(bytes.Length);
+                mso.Write(lengthBytes, 0, 4);
+                using (var gs = new GZipStream(mso, CompressionMode.Compress))
+                {
+                    gs.Write(bytes, 0, bytes.Length);
+                    gs.Flush();
+                }
+
+                return mso.ToArray();
+            }
+        }
+
+        protected string Unzip(byte[] bytes)
+        {
+            using (var msi = new MemoryStream(bytes))
+            {
+                byte[] lengthBytes = new byte[4];
+                msi.Read(lengthBytes, 0, 4);
+
+                var length = BitConverter.ToInt32(lengthBytes, 0);
+                using (var gs = new GZipStream(msi, CompressionMode.Decompress))
+                {
+                    var result = new byte[length];
+                    gs.Read(result, 0, length);
+                    return Encoding.UTF8.GetString(result);
+                }
+            }
+        }
+        #endregion
+
+        private void HandleMessageBroker(byte[] receivedBytes)
 		{
 			var header = ReplaceHeader(State.Header, "<MC>", "</MC>");
 

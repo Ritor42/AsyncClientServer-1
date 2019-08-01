@@ -108,7 +108,5 @@ namespace AsyncClientServer.Messaging.Metadata
 		/// </summary>
 		/// <param name="bytes"></param>
 		void AppendBytes(byte[] bytes);
-
-
 	}
 }

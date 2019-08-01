@@ -24,7 +24,7 @@ namespace AsyncClientServer.Messaging.Metadata
 		//8192 = 8kb
 		//16384 = 16kb
 		//131072 = 0.131072Mb
-		private static int _bufferSize = 524288;
+		private static int _bufferSize = 5242880; //miafaszértegycsomagbakellfogadniplspls
 		private IList<byte> _receivedBytes = new List<byte>();
 
 		public string RemoteIPv4 { get; set; }
@@ -32,7 +32,6 @@ namespace AsyncClientServer.Messaging.Metadata
 
 		public string LocalIPv4 { get; set; }
 		public string LocalIPv6 { get; set; }
-
 
 		/// <summary>
 		/// Constructor for StateObject
