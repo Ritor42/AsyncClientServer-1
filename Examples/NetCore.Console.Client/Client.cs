@@ -21,16 +21,24 @@ namespace NetCore.Console.Client
 			_client = new AsyncSocketClient {AllowReceivingFiles = true};
 
 			//Create the MessageContract implementation and add to the client
-			_messageAContract = new MessageA("MessageAHeader");
+			_messageAContract = new MessageA("MESSAGE");
 			_client.AddMessageContract(_messageAContract);
 			//Bind MessageContract Event
 			_messageAContract.OnMessageReceived += MessageAContractOnOnMessageReceived;
 
 			BindEvents();
-			_client.StartClient("127.0.0.1", 13000);
-			
+			_client.StartClient("192.168.0.249", 4040);
 
-			while (true)
+            _client.SendMessage("UserClient", false, false);
+            _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.ShotTaskType, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
+            _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.AssetTaskType, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
+            _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.AssetClass, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
+            _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.Status, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
+            _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.Folder, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
+            _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.Project, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
+            _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.ShotTaskType, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
+
+            while (true)
 			{
 				Options();
 
@@ -100,7 +108,7 @@ namespace NetCore.Console.Client
 			Write("Enter your message you want to send to the server...  ");
 			var message = System.Console.ReadLine();
 
-			_client.SendMessage(message, _encrypt, false);
+			_client.SendMessage(message, false, false);
 		}
 
 		private static void SendMessageContract()

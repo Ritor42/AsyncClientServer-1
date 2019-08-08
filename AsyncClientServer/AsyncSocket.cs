@@ -13,6 +13,7 @@ using AsyncClientServer.Messaging.Compression;
 using AsyncClientServer.Messaging.Cryptography;
 using AsyncClientServer.Messaging.MessageContract;
 using AsyncClientServer.Messaging.Metadata;
+using zlib;
 
 namespace AsyncClientServer
 {
@@ -348,39 +349,28 @@ namespace AsyncClientServer
 		}
 
         #region Gzip
-        protected byte[] Zip(string str)
+        public static byte[] Zip(string message)
         {
-            var bytes = Encoding.UTF8.GetBytes(str);
-
-            using (var mso = new MemoryStream())
+            byte[] inData = Encoding.UTF8.GetBytes(message);
+            using (MemoryStream outMemoryStream = new MemoryStream())
+            using (ZOutputStream outZStream = new ZOutputStream(outMemoryStream, zlibConst.Z_DEFAULT_COMPRESSION))
+            using (Stream inMemoryStream = new MemoryStream(inData))
             {
-                var lengthBytes = BitConverter.GetBytes(bytes.Length);
-                mso.Write(lengthBytes, 0, 4);
-                using (var gs = new GZipStream(mso, CompressionMode.Compress))
-                {
-                    gs.Write(bytes, 0, bytes.Length);
-                    gs.Flush();
-                }
-
-                return mso.ToArray();
+                CopyStream(inMemoryStream, outZStream);
+                outZStream.finish();
+                return outMemoryStream.ToArray();
             }
         }
 
-        protected string Unzip(byte[] bytes)
+        public static void CopyStream(System.IO.Stream input, System.IO.Stream output)
         {
-            using (var msi = new MemoryStream(bytes))
+            byte[] buffer = new byte[2000];
+            int len;
+            while ((len = input.Read(buffer, 0, 2000)) > 0)
             {
-                byte[] lengthBytes = new byte[4];
-                msi.Read(lengthBytes, 0, 4);
-
-                var length = BitConverter.ToInt32(lengthBytes, 0);
-                using (var gs = new GZipStream(msi, CompressionMode.Decompress))
-                {
-                    var result = new byte[length];
-                    gs.Read(result, 0, length);
-                    return Encoding.UTF8.GetString(result);
-                }
+                output.Write(buffer, 0, len);
             }
+            output.Flush();
         }
         #endregion
 

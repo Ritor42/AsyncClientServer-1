@@ -26,8 +26,8 @@ namespace AsyncClientServer.Messaging.Handlers
 
 			if (Client != null)
 			{
-				Client.StartReceiving(State, receive);
-				return;
+				//Client.StartReceiving(State, receive);
+				//return;
 			}
 		}
 

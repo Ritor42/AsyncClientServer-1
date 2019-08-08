@@ -221,11 +221,11 @@ namespace AsyncClientServer.Client
 			}
 		}
 
-		#endregion
+        #endregion
 
-		#region Receiving
+        #region Receiving
 
-		//Start receiving
+        //Start receiving
 		internal override void StartReceiving(ISocketState state, int offset = 0)
 		{
 			if (offset > 0)
@@ -240,37 +240,37 @@ namespace AsyncClientServer.Client
 					Array.Copy(state.UnhandledBytes, 0, state.Buffer, 0, state.UnhandledBytes.Length);
 			}
 
-			state.Listener.BeginReceive(state.Buffer, offset, state.BufferSize - offset, SocketFlags.None,this.ReceiveCallback, state);
+			state.Listener.BeginReceive(state.Buffer, offset, state.BufferSize - offset, SocketFlags.None, this.ReceiveCallback, state);
 		}
 
-		//Handle a message
-		protected override void HandleMessage(IAsyncResult result)
-		{
-			var state = (SocketState)result.AsyncState;
-			try
-			{
-				var receive = state.Listener.EndReceive(result);
+        //Handle a message
+        protected override void HandleMessage(IAsyncResult result)
+        {
+            var state = (SocketState)result.AsyncState;
+            try
+            {
+                var receive = state.Listener.EndReceive(result);
 
-				if (state.Flag == 0)
-				{
-					state.CurrentState = new InitialHandlerState(state, this, null);
-				}
+                if (state.Flag == 0)
+                {
+                    state.CurrentState = new InitialHandlerState(state, this, null);
+                }
 
-				if (receive > 0)
-				{
-					state.CurrentState.Receive(receive);
-				}
-			}
-			catch (Exception ex)
-			{
-				state.Reset();
-				InvokeErrorThrown(ex);
-			}
+                if (receive > 0)
+                {
+                    state.CurrentState.Receive(receive);
+                }
+            }
+            catch (Exception ex)
+            {
+                state.Reset();
+                InvokeErrorThrown(ex);
+            }
             finally
             {
                 StartReceiving(state);
             }
-		}
+        }
 
 		#endregion
 

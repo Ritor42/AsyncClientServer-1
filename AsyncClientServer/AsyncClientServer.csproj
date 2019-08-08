@@ -13,4 +13,9 @@
     <Folder Include="Server\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="zlib.net" Version="1.0.4" />
+    <PackageReference Include="Zlib.Portable.Signed" Version="1.11.0" />
+  </ItemGroup>
+
 </Project>

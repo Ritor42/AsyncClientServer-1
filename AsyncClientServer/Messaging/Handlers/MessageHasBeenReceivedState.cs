@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
+using System.Threading;
 using AsyncClientServer.Client;
+using AsyncClientServer.Messaging.Compression;
 using AsyncClientServer.Messaging.MessageContract;
 using AsyncClientServer.Messaging.Metadata;
 using AsyncClientServer.Server;
-
+using zlib;
 namespace AsyncClientServer.Messaging.Handlers
 {
 	internal class MessageHasBeenReceivedState: SocketStateState
@@ -23,18 +26,8 @@ namespace AsyncClientServer.Messaging.Handlers
 		/// <param name="receive"></param>
 		public override void Receive(int receive)
 		{
-			//Decode the received message, decrypt when necessary.
-			var text = string.Empty;
-
-			byte[] receivedMessageBytes = State.ReceivedBytes;
-
-            //Check if the bytes are encrypted or not.
-            //if (State.Encrypted)
-            //	text = Encrypter.DecryptStringFromBytes(receivedMessageBytes);
-            //else
-            //	text = Encoding.UTF8.GetString(receivedMessageBytes);
-
-            text = Unzip(receivedMessageBytes);
+			byte[] receivedMessageBytes = State.ReceivedBytes.Take(receive).ToArray();
+            var text = Unzip(receivedMessageBytes);
 
 			if (Client == null)
 			{
@@ -70,39 +63,39 @@ namespace AsyncClientServer.Messaging.Handlers
 		}
 
         #region Gzip
-        protected byte[] Zip(string str)
+        public string Unzip(byte[] inData)
         {
-            var bytes = Encoding.UTF8.GetBytes(str);
+            string result = null;
 
-            using (var mso = new MemoryStream())
+            using (MemoryStream outMemoryStream = new MemoryStream())
+            using (ZOutputStream outZStream = new ZOutputStream(outMemoryStream))
+            using (Stream inMemoryStream = new MemoryStream(inData))
             {
-                var lengthBytes = BitConverter.GetBytes(bytes.Length);
-                mso.Write(lengthBytes, 0, 4);
-                using (var gs = new GZipStream(mso, CompressionMode.Compress))
+                try
                 {
-                    gs.Write(bytes, 0, bytes.Length);
-                    gs.Flush();
+                    CopyStream(inMemoryStream, outZStream);
+                    outZStream.Flush();
+                    outZStream.finish();
+                    result = Encoding.UTF8.GetString(outMemoryStream.ToArray());
                 }
-
-                return mso.ToArray();
+                catch (Exception)
+                {
+                    result = null;
+                }
             }
+
+            return result;
         }
 
-        protected string Unzip(byte[] bytes)
+        public void CopyStream(Stream input, Stream output)
         {
-            using (var msi = new MemoryStream(bytes))
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = input.Read(buffer, 0, buffer.Length)) > 0)
             {
-                byte[] lengthBytes = new byte[4];
-                msi.Read(lengthBytes, 0, 4);
-
-                var length = BitConverter.ToInt32(lengthBytes, 0);
-                using (var gs = new GZipStream(msi, CompressionMode.Decompress))
-                {
-                    var result = new byte[length];
-                    gs.Read(result, 0, length);
-                    return Encoding.UTF8.GetString(result);
-                }
+                output.Write(buffer, 0, len);
             }
+            output.Flush();
         }
         #endregion
 

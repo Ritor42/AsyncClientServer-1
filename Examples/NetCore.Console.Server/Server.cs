@@ -26,7 +26,7 @@ namespace NetCore.Console.Server
 			_messageAContract.OnMessageReceived += MessageAContractOnOnMessageReceived;
 
 			BindEvents();
-			_listener.StartListening(13000);
+			_listener.StartListening(4041);
 
 
 
