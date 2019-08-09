@@ -27,17 +27,22 @@ namespace NetCore.Console.Client
 			_messageAContract.OnMessageReceived += MessageAContractOnOnMessageReceived;
 
 			BindEvents();
-			_client.StartClient("192.168.0.249", 4040);
+			_client.StartClient("127.0.0.1", 4040);
 
             _client.SendMessage("UserClient", false, false);
-            _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.ShotTaskType, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
-            _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.AssetTaskType, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
-            _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.AssetClass, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
-            _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.Status, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
-            _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.Folder, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
-            _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.Project, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
-            _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.ShotTaskType, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
-
+            Parallel.For(0, 10, i =>
+              {
+                  _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.ShotTaskType, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
+                  _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.AssetTaskType, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
+                  _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.AssetClass, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
+                  _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.Status, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
+                  _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.Folder, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
+                  _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.Project, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
+                  _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.Project, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
+                  _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.Project, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
+                  _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.Project, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
+                  _client.SendMessage("{\"$id\":\"1\",\"$type\":\"Common.Message.Request, Common\",\"ID\":17,\"Item\":\"Data.ShotTaskType, Data, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null\",\"Message\":null,\"Method\":1}", false, false);
+              });
             while (true)
 			{
 				Options();
@@ -189,7 +194,7 @@ namespace NetCore.Console.Client
 
 		private static void ServerMessageReceived(SocketClient a, string msg)
 		{
-			WriteLine("Message received from the server: " + msg);
+			WriteLine("Message received from the server: " + msg.Length);
 		}
 
 		private static void FileReceived(SocketClient a, string file)

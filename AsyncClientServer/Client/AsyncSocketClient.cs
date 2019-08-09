@@ -107,7 +107,7 @@ namespace AsyncClientServer.Client
 				server.EndConnect(result);
 				ConnectedMre.Set();
 				KeepAliveTimer.Enabled = true;
-				Receive();
+				Task.Run(() => Receive());
 			}
 			catch (SocketException)
 			{
