@@ -342,7 +342,7 @@ namespace AsyncClientServer.Server
 			{
                 if (this.GetClient(id) is ISocketState state && state.Listener is Socket socket)
                 {
-                    return !((socket.Poll(1000, SelectMode.SelectRead) && (socket.Available == 0)) || !socket.Connected);
+                    return socket.Connected; //&& !(socket.Poll(1000, SelectMode.SelectRead) && (socket.Available == 0));
                 }
 			}
 			catch (Exception ex)
@@ -439,17 +439,17 @@ namespace AsyncClientServer.Server
 		{
 			while (!Token.IsCancellationRequested)
 			{
-				BlockingMessageQueue.TryDequeue(out var message);
-
-				if (IsConnected(message.SocketState.Id))
-				{
-					BeginSendFromQueue(message);
-				}
-				else
-				{
-					Close(message.SocketState.Id);
-				}
-
+                if (BlockingMessageQueue.TryDequeue(out var message))
+                {
+                    if (IsConnected(message.SocketState.Id))
+                    {
+                        BeginSendFromQueue(message);
+                    }
+                    else
+                    {
+                        Close(message.SocketState.Id);
+                    }
+                }
 				message = null;
 			}
 		}
@@ -468,6 +468,7 @@ namespace AsyncClientServer.Server
 			catch (Exception ex)
 			{
                 this.InvokeErrorThrown(ex);
+                Close(((ISocketState)result.AsyncState).Id);
 			}
 		}
 

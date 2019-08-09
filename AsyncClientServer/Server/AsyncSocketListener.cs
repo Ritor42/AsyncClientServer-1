@@ -156,8 +156,7 @@ namespace AsyncClientServer.Server
 					Array.Copy(state.UnhandledBytes, 0, state.Buffer, 0, state.UnhandledBytes.Length);
 			}
 
-			state.Listener.BeginReceive(state.Buffer, offset, state.BufferSize - offset, SocketFlags.None,
-				ReceiveCallback, state);
+			state.Listener.BeginReceive(state.Buffer, offset, state.BufferSize - offset, SocketFlags.None, ReceiveCallback, state);
 		}
 
 		//Handles messages
@@ -193,21 +192,6 @@ namespace AsyncClientServer.Server
 					{
 						state.CurrentState.Receive(receive);
 					}
-
-					/*When the full message has been received. */
-					if (state.Read == state.MessageSize)
-					{
-						StartReceiving(state);
-						return;
-					}
-
-					/*Check if there still are messages to be received.*/
-					if (receive == state.BufferSize)
-					{
-						StartReceiving(state);
-						return;
-					}
-
 
 					StartReceiving(state);
 				}
@@ -295,7 +279,7 @@ namespace AsyncClientServer.Server
 				if (message.MessageType == MessageType.Partial)
 					message.SocketState.Listener.BeginSend(message.MessageBytes, 0, message.MessageBytes.Length, SocketFlags.None, SendCallbackPartial, message.SocketState);
 				if (message.MessageType == MessageType.Complete)
-					message.SocketState.Listener.BeginSend(message.MessageBytes, 0, message.MessageBytes.Length, SocketFlags.None, SendCallbackPartial, message.SocketState);
+					message.SocketState.Listener.BeginSend(message.MessageBytes, 0, message.MessageBytes.Length, SocketFlags.None, SendCallback, message.SocketState);
 			}
 			catch (Exception ex)
 			{
