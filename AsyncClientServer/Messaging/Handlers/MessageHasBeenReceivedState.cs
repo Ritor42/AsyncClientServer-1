@@ -65,6 +65,7 @@ namespace AsyncClientServer.Messaging.Handlers
         #region Gzip
         public string Unzip(byte[] inData)
         {
+            return Encoding.UTF8.GetString(inData);
             string result = null;
 
             using (MemoryStream outMemoryStream = new MemoryStream())

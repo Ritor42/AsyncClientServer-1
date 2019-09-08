@@ -83,6 +83,10 @@ namespace AsyncClientServer.Server
 				{
 					throw new Exception(se.ToString());
 				}
+                catch(Exception)
+                {
+
+                }
 			}, Token);
 
 		}
@@ -135,6 +139,10 @@ namespace AsyncClientServer.Server
 			{
                 this.InvokeErrorThrown(se);
 			}
+            catch(Exception)
+            {
+
+            }
 
 		}
 
@@ -312,7 +320,7 @@ namespace AsyncClientServer.Server
 			}
 			catch (Exception ex)
 			{
-				throw new Exception(ex.Message, ex);
+				//throw new Exception(ex.Message, ex);
 			}
 			finally
 			{
@@ -339,7 +347,7 @@ namespace AsyncClientServer.Server
 			}
 			catch (Exception ex)
 			{
-				throw new Exception(ex.Message, ex);
+				//throw new Exception(ex.Message, ex);
 			}
 		}
 

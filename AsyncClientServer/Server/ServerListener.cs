@@ -389,7 +389,7 @@ namespace AsyncClientServer.Server
 			}
 			catch (Exception ex)
 			{
-				throw new Exception(ex.Message, ex);
+				//throw new Exception(ex.Message, ex);
 			}
 		}
 
@@ -417,8 +417,12 @@ namespace AsyncClientServer.Server
 			}
 			catch (SocketException se)
 			{
-				throw new Exception(se.ToString());
+				//throw new Exception(se.ToString());
 			}
+            catch(Exception)
+            {
+
+            }
 			finally
 			{
 				lock (ConnectedClients)

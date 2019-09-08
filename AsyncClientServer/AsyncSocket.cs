@@ -351,6 +351,7 @@ namespace AsyncClientServer
         #region Gzip
         public static byte[] Zip(string message)
         {
+            return Encoding.UTF8.GetBytes(message);
             byte[] inData = Encoding.UTF8.GetBytes(message);
             using (MemoryStream outMemoryStream = new MemoryStream())
             using (ZOutputStream outZStream = new ZOutputStream(outMemoryStream, zlibConst.Z_DEFAULT_COMPRESSION))
