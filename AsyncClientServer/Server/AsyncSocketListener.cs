@@ -81,11 +81,11 @@ namespace AsyncClientServer.Server
 				}
 				catch (SocketException se)
 				{
-					throw new Exception(se.ToString());
+                    InvokeErrorThrown(se);
 				}
-                catch(Exception)
+                catch(Exception e)
                 {
-
+                    InvokeErrorThrown(e);
                 }
 			}, Token);
 
@@ -137,11 +137,11 @@ namespace AsyncClientServer.Server
 			}
 			catch (SocketException se)
 			{
-                this.InvokeErrorThrown(se);
+                InvokeErrorThrown(se);
 			}
-            catch(Exception)
+            catch(Exception e)
             {
-
+                InvokeErrorThrown(e);
             }
 
 		}
@@ -312,14 +312,17 @@ namespace AsyncClientServer.Server
 			}
 			catch (SocketException se)
 			{
-				throw new SocketException(se.ErrorCode);
+                InvokeErrorThrown(se);
+				//throw new SocketException(se.ErrorCode);
 			}
 			catch (ObjectDisposedException ode)
 			{
-				throw new ObjectDisposedException(ode.ObjectName, ode.Message);
+                InvokeErrorThrown(ode);
+				//throw new ObjectDisposedException(ode.ObjectName, ode.Message);
 			}
 			catch (Exception ex)
 			{
+                InvokeErrorThrown(ex);
 				//throw new Exception(ex.Message, ex);
 			}
 			finally
@@ -339,14 +342,17 @@ namespace AsyncClientServer.Server
 			}
 			catch (SocketException se)
 			{
-				throw new SocketException(se.ErrorCode);
+                InvokeErrorThrown(se);
+				//throw new SocketException(se.ErrorCode);
 			}
 			catch (ObjectDisposedException ode)
 			{
-				throw new ObjectDisposedException(ode.ObjectName, ode.Message);
+                InvokeErrorThrown(ode);
+				//throw new ObjectDisposedException(ode.ObjectName, ode.Message);
 			}
 			catch (Exception ex)
 			{
+                InvokeErrorThrown(ex);
 				//throw new Exception(ex.Message, ex);
 			}
 		}
