@@ -417,11 +417,12 @@ namespace AsyncClientServer.Server
 			}
 			catch (SocketException se)
 			{
-				//throw new Exception(se.ToString());
+                //throw new Exception(se.ToString());
+                InvokeErrorThrown(se);
 			}
-            catch(Exception)
+            catch(Exception e)
             {
-
+                InvokeErrorThrown(e);
             }
 			finally
 			{

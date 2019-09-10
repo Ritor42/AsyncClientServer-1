@@ -307,7 +307,8 @@ namespace AsyncClientServer.Server
 			try
 			{
 				state.Listener.EndSend(result);
-				if (state.Close)
+                InvokeMessageSubmitted(state.Id, state.Close);
+                if (state.Close)
 					Close(state.Id);
 			}
 			catch (SocketException se)
@@ -324,10 +325,6 @@ namespace AsyncClientServer.Server
 			{
                 InvokeErrorThrown(ex);
 				//throw new Exception(ex.Message, ex);
-			}
-			finally
-			{
-				InvokeMessageSubmitted(state.Id, state.Close);
 			}
 		}
 
