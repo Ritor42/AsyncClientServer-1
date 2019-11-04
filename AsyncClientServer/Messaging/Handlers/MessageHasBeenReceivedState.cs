@@ -65,27 +65,38 @@ namespace AsyncClientServer.Messaging.Handlers
         #region Gzip
         public string Unzip(byte[] inData)
         {
-            return Encoding.UTF8.GetString(inData);
-            string result = null;
+            int size = inData[inData.Length - 4] + inData[inData.Length - 3] * 256 + inData[inData.Length - 2] * 256 * 256;
+            byte[] result = new byte[size];
 
-            using (MemoryStream outMemoryStream = new MemoryStream())
-            using (ZOutputStream outZStream = new ZOutputStream(outMemoryStream))
-            using (Stream inMemoryStream = new MemoryStream(inData))
+            using (var msi = new MemoryStream(inData))
             {
-                try
+                using (var gs = new GZipStream(msi, CompressionMode.Decompress))
                 {
-                    CopyStream(inMemoryStream, outZStream);
-                    outZStream.Flush();
-                    outZStream.finish();
-                    result = Encoding.UTF8.GetString(outMemoryStream.ToArray());
-                }
-                catch (Exception)
-                {
-                    result = null;
+                    gs.Read(result, 0, size);
                 }
             }
+            return Encoding.UTF8.GetString(result);
+            //return Encoding.UTF8.GetString(inData);
+            //string result = null;
 
-            return result;
+            //using (MemoryStream outMemoryStream = new MemoryStream())
+            //using (ZOutputStream outZStream = new ZOutputStream(outMemoryStream))
+            //using (Stream inMemoryStream = new MemoryStream(inData))
+            //{
+            //    try
+            //    {
+            //        CopyStream(inMemoryStream, outZStream);
+            //        outZStream.Flush();
+            //        outZStream.finish();
+            //        result = Encoding.UTF8.GetString(outMemoryStream.ToArray());
+            //    }
+            //    catch (Exception)
+            //    {
+            //        result = null;
+            //    }
+            //}
+
+            //return result;
         }
 
         public void CopyStream(Stream input, Stream output)
