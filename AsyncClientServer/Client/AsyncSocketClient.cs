@@ -109,15 +109,8 @@ namespace AsyncClientServer.Client
 				KeepAliveTimer.Enabled = true;
 				Task.Run(() => Receive());
 			}
-			catch (SocketException)
+			catch (Exception)
 			{
-				Thread.Sleep(ReconnectInSeconds * 1000);
-				if (!Token.IsCancellationRequested)
-					Listener.BeginConnect(Endpoint, OnConnectCallback, Listener);
-			}
-			catch (Exception ex)
-			{
-				throw new Exception(ex.Message, ex);
 			}
 		}
 

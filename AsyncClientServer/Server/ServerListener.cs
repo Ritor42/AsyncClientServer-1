@@ -262,16 +262,19 @@ namespace AsyncClientServer.Server
 			}
 		}
 
+		private readonly object lockClients = new object();
+
 		/// <summary>
 		/// Check all clients and show which are disconnected.
 		/// </summary>
 		public void CheckAllClients()
 		{
-			lock (ConnectedClients)
+			var clients = ConnectedClients.Keys.ToList();
+			lock (lockClients)
 			{
-				if (ConnectedClients.Keys.Count > 0)
+				if (clients.Count > 0)
 				{
-					foreach (var id in ConnectedClients.Keys)
+					foreach (var id in clients)
 					{
 						CheckClient(id);
 					}
@@ -306,8 +309,8 @@ namespace AsyncClientServer.Server
 		{
 			TokenSource.Cancel();
 			IsRunning = false;
-
-			foreach (var id in ConnectedClients.Keys.ToList())
+			var clients = ConnectedClients.Keys.ToList();
+			foreach (var id in clients)
 			{
 				Close(id);
 			}
@@ -342,7 +345,7 @@ namespace AsyncClientServer.Server
 			{
                 if (this.GetClient(id) is ISocketState state && state.Listener is Socket socket)
                 {
-                    return socket.Connected; //&& !(socket.Poll(1000, SelectMode.SelectRead) && (socket.Available == 0));
+                    return socket.Connected && !(socket.Poll(1000, SelectMode.SelectRead) && (socket.Available == 0));
                 }
 			}
 			catch (Exception ex)
