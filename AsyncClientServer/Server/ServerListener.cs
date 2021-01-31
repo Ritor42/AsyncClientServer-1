@@ -345,7 +345,7 @@ namespace AsyncClientServer.Server
 			{
                 if (this.GetClient(id) is ISocketState state && state.Listener is Socket socket)
                 {
-                    return socket.Connected && !(socket.Poll(1000, SelectMode.SelectRead) && (socket.Available == 0));
+                    return socket.Connected || !(socket.Poll(1000, SelectMode.SelectRead) && (socket.Available == 0));
                 }
 			}
 			catch (Exception ex)

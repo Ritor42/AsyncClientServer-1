@@ -155,7 +155,7 @@ namespace AsyncClientServer.Client
 		{
 			try
 			{
-				return !((Listener.Poll(1000, SelectMode.SelectRead) && (Listener.Available == 0)) || !Listener.Connected);
+				return Listener != null && !((Listener.Poll(1000, SelectMode.SelectRead) && (Listener.Available == 0)) || !Listener.Connected);
 			}
 			catch (Exception)
 			{
